@@ -80,9 +80,7 @@ class Calendar:
 
 
 MAX_CLOCK_OUT_TIME = TimeOfDay(hour=22)
-MAX_WORKING_TIME_PER_DAY = timedelta(hours=10, minutes=48)
-# MAX_WORKING_TIME_PER_DAY = timedelta(hours=10, minutes=0)
-# DAILY_WORKTIME= timedelta(hours=8, minutes=48)
+MAX_WORKING_TIME_PER_DAY = timedelta(hours=10, minutes=0)
 
 class Timesheet:
     _max_clockout = MAX_CLOCK_OUT_TIME
