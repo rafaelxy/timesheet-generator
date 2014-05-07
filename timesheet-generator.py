@@ -162,7 +162,9 @@ class Timesheet:
     def pop(self):
         return tuple(self._table.pop())
 
-def print_worked_day(clockin, lunch_break, lunch_break_duration, clockout, ftime="%I:%M:%S %p"):
+# def print_worked_day(clockin, lunch_break, lunch_break_duration, clockout, ftime="%I:%M:%S %p"):
+#TODO: add option to change format
+def print_worked_day(clockin, lunch_break, lunch_break_duration, clockout, ftime="%H:%M"):
     back_from_lunch = lunch_break + lunch_break_duration
     print("%s\t%s\t%s\t%s" % (clockin.strftime(ftime),
                                 lunch_break.strftime(ftime),
