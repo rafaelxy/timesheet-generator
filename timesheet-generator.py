@@ -81,21 +81,22 @@ class Calendar:
 
 MAX_CLOCK_OUT_TIME = TimeOfDay(hour=22)
 MAX_WORKING_TIME_PER_DAY = timedelta(hours=10, minutes=48)
-DAILY_WORKTIME= timedelta(hours=8, minutes=48)
+# MAX_WORKING_TIME_PER_DAY = timedelta(hours=10, minutes=0)
+# DAILY_WORKTIME= timedelta(hours=8, minutes=48)
 
 class Timesheet:
     _max_clockout = MAX_CLOCK_OUT_TIME
     _max_working_time = MAX_WORKING_TIME_PER_DAY
-    _daily_worktime = DAILY_WORKTIME
     _table = []
 
     def __init__(self, lunch_break, lunch_duration, earlier_clockin,
-                    later_clockin, lunch_variation):
+                    later_clockin, lunch_variation, daily_worktime):
         self._lunch_break = lunch_break
         self._lunch_duration = lunch_duration
         self._earlier_clockin = earlier_clockin
         self._later_clockin = later_clockin
         self._lunch_variation = lunch_variation
+        self._daily_worktime = daily_worktime
 
     def _generate_day(self, working_time):
         clockin = random_time(self._earlier_clockin, self._later_clockin)
@@ -244,6 +245,8 @@ def parse_args(args):
     parser.add_argument("--later-clockin-time", metavar="HH:MM",
                         type=parseTimeArg, default="10:00", help="Later time " +
                         "for clock-in")
+    parser.add_argument("--daily-worktime", metavar="HH:MM", type=parseTimeArg,
+                        default="8:00", help="Daily Worktime")
 
     return parser.parse_args(args)
 
@@ -265,6 +268,10 @@ def main():
     earlier_clockin = TimeOfDay(int(h), int(m))
     (h, m) = args.later_clockin_time.split(':')
     later_clockin = TimeOfDay(int(h), int(m))
+    
+    daily_worktime = datetime.strptime(args.daily_worktime, "%H:%M")
+    daily_worktime = timedelta(hours=daily_worktime.hour,
+                             minutes=daily_worktime.minute)
 
     balance = timedelta()
     if args.balance:
@@ -276,7 +283,7 @@ def main():
     calendar = Calendar(firstday, totaldays, holiday_list)
 
     timesheet = Timesheet(lunch_break, lunch_break_duration, earlier_clockin,
-                            later_clockin, args.lunch_variation)
+                            later_clockin, args.lunch_variation, daily_worktime)
 
     timesheet.generate(calendar.worked_days(), balance)
 
