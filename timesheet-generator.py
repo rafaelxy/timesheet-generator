@@ -90,11 +90,12 @@ class Timesheet:
     _table = []
 
     def __init__(self, lunch_break, lunch_duration, earlier_clockin,
-                    later_clockin):
+                    later_clockin, lunch_variation):
         self._lunch_break = lunch_break
         self._lunch_duration = lunch_duration
         self._earlier_clockin = earlier_clockin
         self._later_clockin = later_clockin
+        self._lunch_variation = lunch_variation
 
     def _generate_day(self, working_time):
         clockin = random_time(self._earlier_clockin, self._later_clockin)
@@ -104,8 +105,11 @@ class Timesheet:
             delta = clockout - self._max_clockout
             clockin -= delta # No problem if clockin < _earlier_clockin
             clockout = self._max_clockout
-
-        return [clockin, self._lunch_break + timedelta(minutes=randint(0,30)), self._lunch_duration, clockout]
+        
+        variation = datetime.strptime(self._lunch_variation, "%H:%M")
+        variation = variation.minute + (60 * variation.hour)
+        lunch_break = self._lunch_break + timedelta(minutes=randint(0,variation))
+        return [clockin, lunch_break, self._lunch_duration, clockout]
 
     def generate(self, worked_days, balance):
         worked_time = worked_days * self._daily_worktime + balance
@@ -230,6 +234,8 @@ def parse_args(args):
                         type=parseDateListArg, help="List of holidays")
     parser.add_argument("--lunch-break", metavar="HH:MM", type=parseTimeArg,
                         default="11:30", help="Lunch time")
+    parser.add_argument("--lunch-variation", metavar="HH:MM", type=parseTimeArg,
+                        default="00:30", help="Lunch start variation")
     parser.add_argument("--lunch-duration", metavar="N", type=int, default=60,
                         help="Lunch duration in minutes")
     parser.add_argument("--earlier-clockin-time", metavar="HH:MM",
@@ -270,7 +276,7 @@ def main():
     calendar = Calendar(firstday, totaldays, holiday_list)
 
     timesheet = Timesheet(lunch_break, lunch_break_duration, earlier_clockin,
-                            later_clockin)
+                            later_clockin, args.lunch_variation)
 
     timesheet.generate(calendar.worked_days(), balance)
 
