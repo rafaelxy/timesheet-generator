@@ -26,3 +26,5 @@ optional arguments:
                         Earlier time for clock-in (default: 9:00)
   --later-clockin-time HH:MM
                         Later time for clock-in (default: 10:00)
+  --daily-worktime HH:MM
+                        Daily Worktime (default: 8:00)
