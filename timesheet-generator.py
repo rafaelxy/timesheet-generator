@@ -7,6 +7,9 @@ import re
 import random
 from datetime import timedelta, datetime, time, date
 
+from random import randint
+
+
 class TimeOfDay(time):
     def __new__(cls, hour=0, minute=0, second=0, microsecond=0):
         self = time.__new__(cls, hour, minute, second,
@@ -102,7 +105,7 @@ class Timesheet:
             clockin -= delta # No problem if clockin < _earlier_clockin
             clockout = self._max_clockout
 
-        return [clockin, self._lunch_break, self._lunch_duration, clockout]
+        return [clockin, self._lunch_break + timedelta(minutes=randint(0,30)), self._lunch_duration, clockout]
 
     def generate(self, worked_days, balance):
         worked_time = worked_days * self._daily_worktime + balance
@@ -223,7 +226,7 @@ def parse_args(args):
     parser.add_argument("--holiday-list", metavar="DD/MM/YY[,DD/MM/YY[...]]",
                         type=parseDateListArg, help="List of holidays")
     parser.add_argument("--lunch-break", metavar="HH:MM", type=parseTimeArg,
-                        default="12:30", help="Lunch time")
+                        default="11:30", help="Lunch time")
     parser.add_argument("--lunch-duration", metavar="N", type=int, default=60,
                         help="Lunch duration in minutes")
     parser.add_argument("--earlier-clockin-time", metavar="HH:MM",
