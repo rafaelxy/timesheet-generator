@@ -19,6 +19,8 @@ optional arguments:
   --holiday-list DD/MM/YY[,DD/MM/YY[...]]
                         List of holidays (default: None)
   --lunch-break HH:MM   Lunch time (default: 11:30)
+  --lunch-variation HH:MM
+                        Lunch start variation (default: 00:30)
   --lunch-duration N    Lunch duration in minutes (default: 60)
   --earlier-clockin-time HH:MM
                         Earlier time for clock-in (default: 9:00)
