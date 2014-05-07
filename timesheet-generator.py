@@ -286,9 +286,9 @@ def main():
             print_worked_day(clockin, lunch, lunch_dur, clockout)
         day += timedelta(days=1)
 
-    print ("\nPaste this output on the spreadsheet. The rows marked with\n" +
-            "'x' reference to holidays. You must mark the actual holiday\n" +
-            "column manually.")
+#     print ("\nPaste this output on the spreadsheet. The rows marked with\n" +
+#             "'x' reference to holidays. You must mark the actual holiday\n" +
+#             "column manually.")
 
 if __name__ == "__main__":
     main()
