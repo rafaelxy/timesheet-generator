@@ -210,6 +210,9 @@ def parseDateListArg(dateList):
     return dateList
 
 def parse_args(args):
+    if len(args) < 1:
+        args.append('-h')
+        
     parser = argparse.ArgumentParser(description="Generate timesheet table " +
                         "based on the worked days and the desired balance",
                         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -238,6 +241,7 @@ def parse_args(args):
 
     return parser.parse_args(args)
 
+#01/05/14 31 --earlier-clockin-time 09:30 --later-clockin-time 10:30
 def main():
     args = parse_args(sys.argv[1:])
 
