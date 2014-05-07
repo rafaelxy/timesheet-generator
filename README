@@ -1,0 +1,26 @@
+usage: timesheet-generator.py [-h] [--balance (p|n)HH:MM]
+                              [--holiday-list DD/MM/YY[,DD/MM/YY[...]]]
+                              [--lunch-break HH:MM] [--lunch-duration N]
+                              [--earlier-clockin-time HH:MM]
+                              [--later-clockin-time HH:MM]
+                              DD/MM/YY NUM_DAYS
+
+Generate timesheet table based on the worked days and the desired balance
+
+positional arguments:
+  DD/MM/YY              First day on the timesheet table
+  NUM_DAYS              Number of days on the timesheet table including
+                        weekends and holidays
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --balance (p|n)HH:MM  Desired timesheet balance. Use prefix 'p' for positive
+                        balance and 'n' for negative balance (default: None)
+  --holiday-list DD/MM/YY[,DD/MM/YY[...]]
+                        List of holidays (default: None)
+  --lunch-break HH:MM   Lunch time (default: 11:30)
+  --lunch-duration N    Lunch duration in minutes (default: 60)
+  --earlier-clockin-time HH:MM
+                        Earlier time for clock-in (default: 9:00)
+  --later-clockin-time HH:MM
+                        Later time for clock-in (default: 10:00)
