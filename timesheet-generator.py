@@ -241,14 +241,11 @@ def parse_args(args):
 
     return parser.parse_args(args)
 
-#01/05/14 31 --earlier-clockin-time 09:30 --later-clockin-time 10:30
 def main():
     args = parse_args(sys.argv[1:])
 
     firstday = datetime.strptime(args.firstday, "%d/%m/%y")
-
     totaldays = int(args.totaldays)
-
     holiday_list = []
     if args.holiday_list:
         for holiday in args.holiday_list.split(','):
@@ -256,12 +253,10 @@ def main():
 
     (h, m) = args.lunch_break.split(':')
     lunch_break = TimeOfDay(int(h), int(m))
-
     lunch_break_duration = timedelta(minutes=args.lunch_duration)
 
     (h, m) = args.earlier_clockin_time.split(':')
     earlier_clockin = TimeOfDay(int(h), int(m))
-
     (h, m) = args.later_clockin_time.split(':')
     later_clockin = TimeOfDay(int(h), int(m))
 
@@ -289,10 +284,6 @@ def main():
             (clockin, lunch, lunch_dur, clockout) = timesheet.pop()
             print_worked_day(clockin, lunch, lunch_dur, clockout)
         day += timedelta(days=1)
-
-#     print ("\nPaste this output on the spreadsheet. The rows marked with\n" +
-#             "'x' reference to holidays. You must mark the actual holiday\n" +
-#             "column manually.")
 
 if __name__ == "__main__":
     main()
