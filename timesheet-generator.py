@@ -88,16 +88,17 @@ class Timesheet:
     _table = []
 
     def __init__(self, lunch_break, lunch_duration, earlier_clockin,
-                    later_clockin, lunch_variation, daily_worktime):
+                    later_clockin, lunch_variation, daily_worktime, rounded):
         self._lunch_break = lunch_break
         self._lunch_duration = lunch_duration
         self._earlier_clockin = earlier_clockin
         self._later_clockin = later_clockin
         self._lunch_variation = lunch_variation
         self._daily_worktime = daily_worktime
+        self._rounded = rounded
 
     def _generate_day(self, working_time):
-        clockin = random_time(self._earlier_clockin, self._later_clockin)
+        clockin = random_time(self._earlier_clockin, self._later_clockin, self._rounded)
         clockout = clockin + self._lunch_duration + working_time
 
         if clockout > self._max_clockout:
@@ -106,8 +107,9 @@ class Timesheet:
             clockout = self._max_clockout
         
         variation = datetime.strptime(self._lunch_variation, "%H:%M")
-        variation = variation.minute + (60 * variation.hour)
-        lunch_break = self._lunch_break + timedelta(minutes=randint(0, variation))
+        lunch_break = random_time(self._lunch_break, self._lunch_break+timedelta(minutes=30), self._rounded)
+        
+        clockin = random_time(self._earlier_clockin, self._later_clockin, self._rounded)
         return [clockin, lunch_break, self._lunch_duration, clockout]
 
     def generate(self, worked_days, balance):
@@ -141,7 +143,7 @@ class Timesheet:
         # Generate 2 days per iteraction
         for i in range((int)(worked_days / 2)):
             # The first day has a random working time
-            worked_day1 = random_time(min_working_time, self._max_working_time)
+            worked_day1 = random_time(min_working_time, self._max_working_time, self._rounded)
             # The following day has the complement to keep the average
             worked_day2 = (2 * average_worked) - worked_day1
 
@@ -197,11 +199,21 @@ def trunc_to_interval(num, min_, max_):
         num = max_
     return num
 
-def random_time(min_, max_):
+def random_time(min_, max_, rounded=False):
     delta_max = (max_ - min_).total_seconds() / 60
     mu = delta_max / 2
     sigma = delta_max / 10
     delta = trunc_to_interval(int(random.gauss(mu, sigma)), 0, delta_max)
+    
+    if rounded:
+        """
+        Rounds all randoms to 5min
+        """
+        mu /= 5
+        sigma /= 5
+        delta = trunc_to_interval(int(random.gauss(mu, sigma)), 0, delta_max)
+        delta *= 5
+        
     return min_ + timedelta(minutes=delta)
 
 def parseSignedTimeArg(time):
@@ -261,12 +273,12 @@ def parse_args(args):
     parser.add_argument("--daily-worktime", metavar="HH:MM", type=parseTimeArg,
                         default="8:00", help="Daily Worktime")
 
-#     parser.add_argument("--csv", metavar="HH:MM", type=parseTimeArg,
-#                         default="false", help="Comma Separated Value")
-    
     parser.add_argument('--csv', dest='csv', action='store_true')
     parser.add_argument('--no-csv', dest='csv', action='store_false')
+    parser.add_argument('--rounded', dest='rounded', action='store_true')
+    parser.add_argument('--no-rounded', dest='rounded', action='store_false')
     parser.set_defaults(csv=False)
+    parser.set_defaults(rounded=True)
 
 
     return parser.parse_args(args)
@@ -311,7 +323,7 @@ def main():
     calendar = Calendar(firstday, totaldays, holiday_list)
 
     timesheet = Timesheet(lunch_break, lunch_break_duration, earlier_clockin,
-                            later_clockin, args.lunch_variation, daily_worktime)
+                            later_clockin, args.lunch_variation, daily_worktime, args.rounded)
 
     timesheet.generate(calendar.worked_days(), balance)
 
