@@ -3,6 +3,9 @@ usage: timesheet-generator.py [-h] [--balance (p|n)HH:MM]
                               [--lunch-break HH:MM] [--lunch-duration N]
                               [--earlier-clockin-time HH:MM]
                               [--later-clockin-time HH:MM]
+                              [--daily-worktime HH:MM]
+                              [--csv]
+                              [--no-rounded]
                               DD/MM/YY NUM_DAYS
 
 Generate timesheet table based on the worked days and the desired balance
@@ -28,3 +31,6 @@ optional arguments:
                         Later time for clock-in (default: 10:00)
   --daily-worktime HH:MM
                         Daily Worktime (default: 8:00)
+  --csv                 Print results as comma separated (default: Disabled)
+  --no-rounded          Schedule is random, the default is rounding to 5min 
+                        (default: Disabled)
