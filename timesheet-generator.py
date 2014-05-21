@@ -102,12 +102,12 @@ class Timesheet:
 
         if clockout > self._max_clockout:
             delta = clockout - self._max_clockout
-            clockin -= delta # No problem if clockin < _earlier_clockin
+            clockin -= delta  # No problem if clockin < _earlier_clockin
             clockout = self._max_clockout
         
         variation = datetime.strptime(self._lunch_variation, "%H:%M")
         variation = variation.minute + (60 * variation.hour)
-        lunch_break = self._lunch_break + timedelta(minutes=randint(0,variation))
+        lunch_break = self._lunch_break + timedelta(minutes=randint(0, variation))
         return [clockin, lunch_break, self._lunch_duration, clockout]
 
     def generate(self, worked_days, balance):
@@ -116,20 +116,20 @@ class Timesheet:
         # some minutes from worked_time variable. These are the remaining_min.
         # They will be added to working time progressively, one per day
         remaining_min = (worked_time.total_seconds() / 60) % worked_days
-        average_worked = ((worked_time - timedelta(minutes=remaining_min)) /
+        average_worked = ((worked_time - timedelta(minutes=remaining_min)) / 
                             worked_days)
         # Warn the user that it's impossible to prevent exceed the max
         # working time
         overloaded = False
         if (worked_time / worked_days) > self._max_working_time:
             overloaded = True
-            print("WARNING: Your average working time is higher than the \n" +
+            print("WARNING: Your average working time is higher than the \n" + 
                   "         max allowed working time. Check the spreadsheet!\n")
 
         # The average_worked = (min_working_time + self._max_working_time) / 2
         # in order to calculate the second day worked time without exceed the
         # max_working_time.
-        min_working_time = (self._max_working_time -
+        min_working_time = (self._max_working_time - 
                             ((self._max_working_time - average_worked) * 2))
 
         # You should not work that much...
@@ -163,9 +163,9 @@ class Timesheet:
         return tuple(self._table.pop())
 
 # def print_worked_day(clockin, lunch_break, lunch_break_duration, clockout, ftime="%I:%M:%S %p"):
-#TODO: add option to change format
+# TODO: add option to change format
 def print_worked_day(clockin, lunch_break, lunch_break_duration, clockout, is_csv=False):
-    ftime="%H:%M"
+    ftime = "%H:%M"
     back_from_lunch = lunch_break + lunch_break_duration
     if is_csv:
         print("%s,%s,%s,%s" % (clockin.strftime(ftime),
@@ -231,18 +231,18 @@ def parse_args(args):
     if len(args) < 1:
         args.append('-h')
         
-    parser = argparse.ArgumentParser(description="Generate timesheet table " +
+    parser = argparse.ArgumentParser(description="Generate timesheet table " + 
                         "based on the worked days and the desired balance",
                         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument("firstday", metavar="DD/MM/YY", type=parseDateArg,
                         help="First day on the timesheet table")
     parser.add_argument("totaldays", metavar="NUM_DAYS", type=int,
-                        help="Number of days on the timesheet table " +
+                        help="Number of days on the timesheet table " + 
                         "including weekends and holidays")
     parser.add_argument("--balance", metavar="(p|n)HH:MM",
-                        type=parseSignedTimeArg, help="Desired timesheet " +
-                        "balance. Use prefix 'p' for positive balance and " +
+                        type=parseSignedTimeArg, help="Desired timesheet " + 
+                        "balance. Use prefix 'p' for positive balance and " + 
                         "'n' for negative balance")
     parser.add_argument("--holiday-list", metavar="DD/MM/YY[,DD/MM/YY[...]]",
                         type=parseDateListArg, help="List of holidays")
@@ -253,10 +253,10 @@ def parse_args(args):
     parser.add_argument("--lunch-duration", metavar="N", type=int, default=60,
                         help="Lunch duration in minutes")
     parser.add_argument("--earlier-clockin-time", metavar="HH:MM",
-                        type=parseTimeArg, default="9:00", help="Earlier " +
+                        type=parseTimeArg, default="9:00", help="Earlier " + 
                         "time for clock-in")
     parser.add_argument("--later-clockin-time", metavar="HH:MM",
-                        type=parseTimeArg, default="10:00", help="Later time " +
+                        type=parseTimeArg, default="10:00", help="Later time " + 
                         "for clock-in")
     parser.add_argument("--daily-worktime", metavar="HH:MM", type=parseTimeArg,
                         default="8:00", help="Daily Worktime")
@@ -264,16 +264,20 @@ def parse_args(args):
 #     parser.add_argument("--csv", metavar="HH:MM", type=parseTimeArg,
 #                         default="false", help="Comma Separated Value")
     
-    parser.add_argument('--csv',dest='csv',action='store_true')
-    parser.add_argument('--no-csv',dest='csv',action='store_false')
+    parser.add_argument('--csv', dest='csv', action='store_true')
+    parser.add_argument('--no-csv', dest='csv', action='store_false')
     parser.set_defaults(csv=False)
 
 
     return parser.parse_args(args)
 
 def main():
+    
     args = parse_args(sys.argv[1:])
 
+
+    # TODO: refactory below
+    # Need to extract this code to another area, not the main()
     firstday = datetime.strptime(args.firstday, "%d/%m/%y")
     totaldays = int(args.totaldays)
     holiday_list = []
@@ -300,6 +304,8 @@ def main():
         (balance_hours, balance_minutes) = args.balance[1:].split(':')
         balance = signal * timedelta(hours=int(balance_hours),
                                         minutes=int(balance_minutes))
+    # TODO: refactory above
+
 
 
     calendar = Calendar(firstday, totaldays, holiday_list)
@@ -309,7 +315,8 @@ def main():
 
     timesheet.generate(calendar.worked_days(), balance)
 
-
+    # TODO: refactory how timesheet is printed, should be a to_string method 
+    # instead of this
     day = firstday
     for i in range(totaldays):
         if calendar.is_holiday(day):
