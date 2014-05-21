@@ -164,18 +164,31 @@ class Timesheet:
 
 # def print_worked_day(clockin, lunch_break, lunch_break_duration, clockout, ftime="%I:%M:%S %p"):
 #TODO: add option to change format
-def print_worked_day(clockin, lunch_break, lunch_break_duration, clockout, ftime="%H:%M"):
+def print_worked_day(clockin, lunch_break, lunch_break_duration, clockout, is_csv=False):
+    ftime="%H:%M"
     back_from_lunch = lunch_break + lunch_break_duration
-    print("%s\t%s\t%s\t%s" % (clockin.strftime(ftime),
-                                lunch_break.strftime(ftime),
-                                back_from_lunch.strftime(ftime),
-                                clockout.strftime(ftime)))
+    if is_csv:
+        print("%s,%s,%s,%s" % (clockin.strftime(ftime),
+                                    lunch_break.strftime(ftime),
+                                    back_from_lunch.strftime(ftime),
+                                    clockout.strftime(ftime)))
+    else:
+        print("%s\t%s\t%s\t%s" % (clockin.strftime(ftime),
+                                    lunch_break.strftime(ftime),
+                                    back_from_lunch.strftime(ftime),
+                                    clockout.strftime(ftime)))
 
-def print_holiday():
-    print("x\t\t\t")
+def print_holiday(is_csv):
+    if is_csv:
+        print("x,x,x")
+    else:
+        print("x\t\t\t")
 
-def print_weekend_day():
-    print("\t\t\t")
+def print_weekend_day(is_csv=False):
+    if is_csv:
+        print(",,,")
+    else:
+        print("\t\t\t")
 
 def trunc_to_interval(num, min_, max_):
     if num < min_:
@@ -248,6 +261,14 @@ def parse_args(args):
     parser.add_argument("--daily-worktime", metavar="HH:MM", type=parseTimeArg,
                         default="8:00", help="Daily Worktime")
 
+#     parser.add_argument("--csv", metavar="HH:MM", type=parseTimeArg,
+#                         default="false", help="Comma Separated Value")
+    
+    parser.add_argument('--csv',dest='csv',action='store_true')
+    parser.add_argument('--no-csv',dest='csv',action='store_false')
+    parser.set_defaults(csv=False)
+
+
     return parser.parse_args(args)
 
 def main():
@@ -280,6 +301,7 @@ def main():
         balance = signal * timedelta(hours=int(balance_hours),
                                         minutes=int(balance_minutes))
 
+
     calendar = Calendar(firstday, totaldays, holiday_list)
 
     timesheet = Timesheet(lunch_break, lunch_break_duration, earlier_clockin,
@@ -287,15 +309,16 @@ def main():
 
     timesheet.generate(calendar.worked_days(), balance)
 
+
     day = firstday
     for i in range(totaldays):
         if calendar.is_holiday(day):
-            print_holiday()
+            print_holiday(args.csv)
         elif calendar.is_weekend(day):
-            print_weekend_day()
+            print_weekend_day(args.csv)
         else:
             (clockin, lunch, lunch_dur, clockout) = timesheet.pop()
-            print_worked_day(clockin, lunch, lunch_dur, clockout)
+            print_worked_day(clockin, lunch, lunch_dur, clockout, args.csv)
         day += timedelta(days=1)
 
 if __name__ == "__main__":
