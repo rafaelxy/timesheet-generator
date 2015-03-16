@@ -8,6 +8,8 @@ usage: timesheet-generator.py [-h] [--balance (p|n)HH:MM]
                               [--no-rounded]
                               DD/MM/YY NUM_DAYS
 
+eg: ./timesheet-generator.py 01/01/15 31
+
 Generate timesheet table based on the worked days and the desired balance
 
 positional arguments:
